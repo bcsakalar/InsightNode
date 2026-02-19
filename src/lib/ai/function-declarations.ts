@@ -57,10 +57,11 @@ export const renderChartDeclaration: FunctionDeclaration = {
         properties: {
             chart_type: {
                 type: Type.STRING,
-                enum: ["bar", "line", "area", "pie", "scatter"],
+                enum: ["bar", "line", "area", "pie", "scatter", "kpi", "table"],
                 description:
                     "The type of chart to render. Choose based on data characteristics: " +
-                    "bar for comparisons, line for trends, area for cumulative, pie for proportions, scatter for correlations.",
+                    "bar for comparisons, line for trends, area for cumulative, pie for proportions, scatter for correlations, " +
+                    "kpi for single numeric values (COUNT, SUM, AVG results with 1 row), table for detailed multi-column data.",
             },
             title: {
                 type: Type.STRING,
@@ -69,7 +70,7 @@ export const renderChartDeclaration: FunctionDeclaration = {
             x_axis_key: {
                 type: Type.STRING,
                 description:
-                    "The data key to use for the X axis (the independent/category variable).",
+                    "The data key to use for the X axis (the independent/category variable). For KPI type, this can be empty string.",
             },
             data_keys: {
                 type: Type.ARRAY,
@@ -84,7 +85,49 @@ export const renderChartDeclaration: FunctionDeclaration = {
                     "Array of hex color codes for the chart series. Use a modern, visually appealing palette. " +
                     "Provide one color per data key.",
             },
+            kpi_value: {
+                type: Type.STRING,
+                description: "For KPI charts only: the main value to display (e.g., '1,234' or '89.5').",
+            },
+            kpi_label: {
+                type: Type.STRING,
+                description: "For KPI charts only: a short label describing the metric (e.g., 'Total Revenue').",
+            },
+            kpi_change: {
+                type: Type.NUMBER,
+                description: "For KPI charts only: percentage change from previous period (e.g., 12.5 for +12.5%, -3.2 for -3.2%). Optional.",
+            },
+            kpi_prefix: {
+                type: Type.STRING,
+                description: "For KPI charts only: prefix symbol (e.g., '$', '₺', '€'). Optional.",
+            },
+            kpi_suffix: {
+                type: Type.STRING,
+                description: "For KPI charts only: suffix symbol (e.g., '%', ' users', ' orders'). Optional.",
+            },
         },
         required: ["chart_type", "title", "x_axis_key", "data_keys", "color_palette"],
+    },
+};
+
+/**
+ * Function declaration for suggesting queries based on schema.
+ */
+export const suggestQueriesDeclaration: FunctionDeclaration = {
+    name: "suggest_queries",
+    description:
+        "Suggests interesting and diverse natural language questions that a user could ask about their database.",
+    parameters: {
+        type: Type.OBJECT,
+        properties: {
+            suggestions: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description:
+                    "Array of 6 natural language questions the user can ask about their data. " +
+                    "Should be diverse: mix of aggregations, trends, comparisons, distributions, rankings.",
+            },
+        },
+        required: ["suggestions"],
     },
 };

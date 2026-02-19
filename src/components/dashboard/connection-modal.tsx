@@ -25,10 +25,12 @@ import {
     ShieldCheck,
     Link2,
     Settings2,
+    Save,
 } from "lucide-react";
 import { toast } from "sonner";
 import { DEFAULT_PORTS } from "@/utils/validators";
 import { useLanguage } from "@/lib/i18n";
+import { saveConnection } from "@/lib/storage/connections";
 import type { ConnectionFormData, DatabaseType } from "@/types/database";
 import type { ApiResponse, ConnectionTestResponse } from "@/types/api";
 import type { DatabaseSchema } from "@/types/database";
@@ -117,6 +119,13 @@ export function ConnectionModal({
             if (data.success && data.data) {
                 setTestStatus("success");
                 toast.success(data.data.message);
+
+                // Save connection to localStorage
+                try {
+                    saveConnection({ ...form, type: dbType } as ConnectionFormData);
+                } catch {
+                    // Non-critical, ignore save errors
+                }
 
                 if (data.data.schema) {
                     onConnected(

@@ -3,7 +3,7 @@
 // ============================================================================
 
 /** Supported chart types for Recharts rendering */
-export type ChartType = "bar" | "line" | "area" | "pie" | "scatter";
+export type ChartType = "bar" | "line" | "area" | "pie" | "scatter" | "kpi" | "table";
 
 /** Color palette entry */
 export interface ChartColor {
@@ -19,6 +19,12 @@ export interface ChartConfig {
     dataKeys: string[];
     colors: ChartColor[];
     data: Record<string, unknown>[];
+    /** KPI-specific fields */
+    kpiValue?: string | number;
+    kpiLabel?: string;
+    kpiChange?: number;
+    kpiPrefix?: string;
+    kpiSuffix?: string;
 }
 
 /** The full AI pipeline response sent to the frontend */

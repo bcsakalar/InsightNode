@@ -1,18 +1,26 @@
 // ============================================================================
-// Empty State — Beautiful placeholder when no charts exist
+// Empty State — Beautiful placeholder when no charts exist, with suggestions
 // ============================================================================
 
 "use client";
 
 import { motion } from "framer-motion";
-import { BarChart3, TrendingUp, PieChart, Sparkles } from "lucide-react";
+import { BarChart3, TrendingUp, PieChart, Sparkles, Loader2 } from "lucide-react";
 import { useLanguage } from "@/lib/i18n";
 
 interface EmptyStateProps {
     isConnected: boolean;
+    suggestions?: string[];
+    suggestionsLoading?: boolean;
+    onSuggestionClick?: (suggestion: string) => void;
 }
 
-export function EmptyState({ isConnected }: EmptyStateProps) {
+export function EmptyState({
+    isConnected,
+    suggestions = [],
+    suggestionsLoading = false,
+    onSuggestionClick,
+}: EmptyStateProps) {
     const { t } = useLanguage();
 
     const FEATURES = [
@@ -88,6 +96,38 @@ export function EmptyState({ isConnected }: EmptyStateProps) {
                     </motion.div>
                 ))}
             </div>
+
+            {/* Suggested queries */}
+            {isConnected && (suggestionsLoading || suggestions.length > 0) && (
+                <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                    className="mt-10 w-full max-w-xl"
+                >
+                    <p className="text-xs font-medium text-muted-foreground text-center mb-3">
+                        {t.emptyState.suggestedQuestions}
+                    </p>
+                    {suggestionsLoading ? (
+                        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-4 w-4 animate-spin" />
+                            <span className="text-xs">{t.emptyState.loadingSuggestions}</span>
+                        </div>
+                    ) : (
+                        <div className="flex flex-wrap justify-center gap-2">
+                            {suggestions.map((s, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => onSuggestionClick?.(s)}
+                                    className="rounded-full border border-border bg-muted/30 px-4 py-2 text-xs text-muted-foreground hover:bg-primary/10 hover:border-primary/30 hover:text-foreground transition-all"
+                                >
+                                    {s}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </motion.div>
+            )}
         </motion.div>
     );
 }

@@ -14,3 +14,9 @@ export interface ConnectionTestResponse {
     connected: boolean;
     message: string;
 }
+
+/** Chat message for multi-turn conversation */
+export interface ConversationMessage {
+    role: "user" | "assistant";
+    content: string;
+}

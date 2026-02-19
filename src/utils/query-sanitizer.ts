@@ -5,6 +5,9 @@
 // This is a critical security boundary for the read-only enforcement.
 // ============================================================================
 
+/** Maximum allowed query length (characters) */
+const MAX_QUERY_LENGTH = 10000;
+
 /** Error thrown when a query contains forbidden operations */
 export class QuerySanitizationError extends Error {
     constructor(message: string) {
@@ -30,12 +33,23 @@ const FORBIDDEN_SQL_KEYWORDS: readonly string[] = [
     "EXEC",
     "EXECUTE",
     "CALL",
-    "INTO",       // INSERT INTO, SELECT INTO
     "MERGE",
     "REPLACE",
     "RENAME",
-    "SET ",        // SET variable = ...
+    "LOAD",
+    "SOURCE",
 ] as const;
+
+/**
+ * Specific dangerous patterns that should be blocked.
+ * More targeted than broad keyword matching.
+ */
+const FORBIDDEN_PATTERNS: readonly RegExp[] = [
+    /\bINTO\s+OUTFILE\b/i,
+    /\bINTO\s+DUMPFILE\b/i,
+    /\bINTO\s+LOCAL\b/i,
+    /\bSET\s+(?!.*\bFROM\b)/i, // SET keyword but not inside a query context
+];
 
 /**
  * MongoDB operations that ARE allowed (whitelist approach).
@@ -64,6 +78,13 @@ function buildForbiddenPattern(): RegExp {
 const FORBIDDEN_PATTERN = buildForbiddenPattern();
 
 /**
+ * Detect MySQL-specific conditional comments like /*!50000 DROP TABLE ... *​/
+ */
+function hasNestedMySQLComments(query: string): boolean {
+    return /\/\*![0-9]*\s+.*\*\//i.test(query);
+}
+
+/**
  * Sanitize a SQL query string. Throws if destructive operations are detected.
  *
  * @param query - The raw SQL query to validate
@@ -71,6 +92,20 @@ const FORBIDDEN_PATTERN = buildForbiddenPattern();
  * @throws {QuerySanitizationError} if destructive keywords are found
  */
 export function sanitizeSQLQuery(query: string): string {
+    // Check query length
+    if (query.length > MAX_QUERY_LENGTH) {
+        throw new QuerySanitizationError(
+            `Query exceeds maximum length of ${MAX_QUERY_LENGTH} characters.`
+        );
+    }
+
+    // Check for MySQL nested comments BEFORE stripping comments
+    if (hasNestedMySQLComments(query)) {
+        throw new QuerySanitizationError(
+            "MySQL conditional comments are not allowed for security reasons."
+        );
+    }
+
     // Remove comments that could hide malicious SQL
     const cleanedQuery = query
         .replace(/--.*$/gm, "")        // Single-line comments
@@ -81,12 +116,22 @@ export function sanitizeSQLQuery(query: string): string {
         throw new QuerySanitizationError("Query cannot be empty.");
     }
 
+    // Check forbidden keywords (whole-word match)
     const match = FORBIDDEN_PATTERN.exec(cleanedQuery);
     if (match) {
         throw new QuerySanitizationError(
             `Forbidden operation detected: "${match[1].toUpperCase()}". ` +
             "Only SELECT queries are allowed for security reasons."
         );
+    }
+
+    // Check specific dangerous patterns
+    for (const pattern of FORBIDDEN_PATTERNS) {
+        if (pattern.test(cleanedQuery)) {
+            throw new QuerySanitizationError(
+                "Forbidden pattern detected. Only SELECT queries are allowed for security reasons."
+            );
+        }
     }
 
     // Ensure the query starts with SELECT (after stripping whitespace)
@@ -109,7 +154,7 @@ export function sanitizeSQLQuery(query: string): string {
 export function sanitizeMongoOperation(operation: string): string {
     const normalized = operation.trim().toLowerCase();
 
-    if (!ALLOWED_MONGO_OPERATIONS.includes(normalized)) {
+    if (!ALLOWED_MONGO_OPERATIONS.map(o => o.toLowerCase()).includes(normalized)) {
         throw new QuerySanitizationError(
             `MongoDB operation "${operation}" is not allowed. ` +
             `Permitted operations: ${ALLOWED_MONGO_OPERATIONS.join(", ")}`

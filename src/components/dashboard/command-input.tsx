@@ -1,5 +1,5 @@
 // ============================================================================
-// Command Input — Natural Language Query Bar
+// Command Input — Natural Language Query Bar with suggestion chips
 // ============================================================================
 
 "use client";
@@ -13,12 +13,14 @@ interface CommandInputProps {
     onSubmit: (prompt: string) => void;
     isLoading: boolean;
     disabled: boolean;
+    suggestions?: string[];
 }
 
 export function CommandInput({
     onSubmit,
     isLoading,
     disabled,
+    suggestions = [],
 }: CommandInputProps) {
     const { t } = useLanguage();
     const [prompt, setPrompt] = useState("");
@@ -109,6 +111,23 @@ export function CommandInput({
                     </Button>
                 </div>
             </div>
+
+            {/* Suggestion chips */}
+            {suggestions.length > 0 && !disabled && (
+                <div className="flex items-center gap-2 mt-3 overflow-x-auto pb-1 scrollbar-hide">
+                    <Sparkles className="h-3 w-3 text-primary shrink-0" />
+                    {suggestions.map((suggestion, i) => (
+                        <button
+                            key={i}
+                            onClick={() => onSubmit(suggestion)}
+                            disabled={isLoading}
+                            className="shrink-0 rounded-full border border-border bg-muted/50 px-3 py-1 text-xs text-muted-foreground hover:bg-primary/10 hover:border-primary/30 hover:text-foreground transition-all disabled:opacity-50"
+                        >
+                            {suggestion}
+                        </button>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

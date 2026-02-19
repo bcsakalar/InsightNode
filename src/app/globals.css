@@ -107,10 +107,107 @@ body {
   border: 1px solid rgba(39, 39, 42, 0.5);
 }
 
+/* Light mode glass card */
+.light .glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+}
+
 /* Gradient text */
 .gradient-text {
   background: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ── Light mode overrides ────────────────────────────────────────────────── */
+.light {
+  --color-background: #fafafa;
+  --color-foreground: #09090b;
+  --color-card: #ffffff;
+  --color-card-foreground: #09090b;
+  --color-popover: #ffffff;
+  --color-popover-foreground: #09090b;
+  --color-primary: #6366f1;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #f4f4f5;
+  --color-secondary-foreground: #09090b;
+  --color-muted: #f4f4f5;
+  --color-muted-foreground: #71717a;
+  --color-accent: #f4f4f5;
+  --color-accent-foreground: #09090b;
+  --color-destructive: #ef4444;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #e4e4e7;
+  --color-input: #e4e4e7;
+  --color-ring: #6366f1;
+  --color-success: #16a34a;
+  --color-warning: #d97706;
+}
+
+.light body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+.light ::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+}
+
+.light ::-webkit-scrollbar-thumb:hover {
+  background: #a1a1aa;
+}
+
+.light .glow-border {
+  animation: glow-pulse-light 3s ease-in-out infinite;
+}
+
+@keyframes glow-pulse-light {
+  0%, 100% {
+    box-shadow:
+      0 0 15px rgba(99, 102, 241, 0.1),
+      0 0 30px rgba(99, 102, 241, 0.03);
+  }
+  50% {
+    box-shadow:
+      0 0 25px rgba(99, 102, 241, 0.2),
+      0 0 50px rgba(99, 102, 241, 0.06);
+  }
+}
+
+.light .shimmer {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(99, 102, 241, 0.04) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s ease-in-out infinite;
+}
+
+/* Hide scrollbar for suggestion chips */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ── Recharts overrides ──────────────────────────────────────────────────── */
+/* Remove default light gray background from Recharts chart area */
+.recharts-cartesian-grid-bg {
+  fill: transparent !important;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+/* Fix recharts wrapper background */
+.recharts-wrapper {
+  background: transparent !important;
 }

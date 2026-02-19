@@ -9,6 +9,7 @@
 import { generateWithTools } from "@/lib/ai/gemini-client";
 import { executeDatabaseQueryDeclaration } from "@/lib/ai/function-declarations";
 import type { DatabaseSchema, DatabaseType } from "@/types/database";
+import type { ConversationMessage } from "@/types/api";
 
 /** Result of query generation */
 export interface GeneratedQuery {
@@ -23,13 +24,16 @@ export interface GeneratedQuery {
  * @param userPrompt - The user's natural language question
  * @param schema - The database schema (tables, columns)
  * @param dbType - The database type to generate for
+ * @param locale - Language locale
+ * @param conversationHistory - Previous conversation messages for multi-turn context
  * @returns A generated query string, type, and explanation
  */
 export async function generateQuery(
     userPrompt: string,
     schema: DatabaseSchema,
     dbType: DatabaseType,
-    locale: string = "en"
+    locale: string = "en",
+    conversationHistory: ConversationMessage[] = []
 ): Promise<GeneratedQuery> {
     // Build schema description for the prompt
     const schemaDescription = schema.tables
@@ -42,7 +46,7 @@ export async function generateQuery(
         .join("\n\n");
 
     // Build the system+user prompt
-    const prompt = buildQueryPrompt(userPrompt, schemaDescription, dbType, locale);
+    const prompt = buildQueryPrompt(userPrompt, schemaDescription, dbType, locale, conversationHistory);
 
     // Call Gemini with function calling in ANY mode
     const response = await generateWithTools(prompt, [
@@ -76,7 +80,8 @@ function buildQueryPrompt(
     userPrompt: string,
     schemaDescription: string,
     dbType: DatabaseType,
-    locale: string
+    locale: string,
+    conversationHistory: ConversationMessage[] = []
 ): string {
     const dbLabel =
         dbType === "postgresql"
@@ -85,12 +90,25 @@ function buildQueryPrompt(
                 ? "MySQL"
                 : "MongoDB";
 
+    // Build conversation context if available
+    let conversationContext = "";
+    if (conversationHistory.length > 0) {
+        const historyLines = conversationHistory
+            .slice(-10) // Keep last 10 messages for context
+            .map((msg) => `- ${msg.role === "user" ? "User" : "Assistant"}: ${msg.content}`)
+            .join("\n");
+        conversationContext = `\nPREVIOUS CONVERSATION:
+${historyLines}
+
+IMPORTANT: The user may be referring to their previous questions or results. Use the conversation context to understand references like "filter that", "show me more details", "break it down by", etc.\n`;
+    }
+
     return `You are an expert ${dbLabel} database analyst. The user wants to query their database using natural language.
 
 DATABASE TYPE: ${dbLabel}
 DATABASE SCHEMA:
 ${schemaDescription}
-
+${conversationContext}
 USER QUESTION: "${userPrompt}"
 
 INSTRUCTIONS:

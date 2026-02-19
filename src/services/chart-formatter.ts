@@ -55,14 +55,32 @@ export async function formatChart(
         color: colorPalette[index] || getDefaultColor(index),
     }));
 
-    return {
-        chartType: args.chart_type as ChartConfig["chartType"],
+    const chartType = args.chart_type as ChartConfig["chartType"];
+
+    const config: ChartConfig = {
+        chartType,
         title: args.title as string,
         xAxisKey: args.x_axis_key as string,
         dataKeys,
         colors,
         data, // Attach the full data to the config
     };
+
+    // Add KPI-specific fields if applicable
+    if (chartType === "kpi") {
+        config.kpiValue = args.kpi_value as string | undefined;
+        config.kpiLabel = args.kpi_label as string | undefined;
+        config.kpiChange = args.kpi_change as number | undefined;
+        config.kpiPrefix = args.kpi_prefix as string | undefined;
+        config.kpiSuffix = args.kpi_suffix as string | undefined;
+
+        // If kpiValue wasn't set by AI, try to extract from data
+        if (!config.kpiValue && data.length > 0 && dataKeys.length > 0) {
+            config.kpiValue = String(data[0][dataKeys[0]] ?? "");
+        }
+    }
+
+    return config;
 }
 
 /** Build the prompt for chart formatting */
@@ -91,9 +109,12 @@ INSTRUCTIONS:
 - For cumulative/volume data → area chart
 - For proportions/distribution → pie chart
 - For correlations between two numeric variables → scatter chart
+- For a single numeric result (COUNT, SUM, AVG with 1 row) → kpi chart
+- For detailed multi-column data with many rows → table
 - Pick visually appealing, modern hex colors. Use a cohesive palette.
 - The x_axis_key should be the category/label column.
 - The data_keys should be the numeric/value columns to visualize.
+- For KPI type: set kpi_value to the main number, kpi_label to describe it, and optionally kpi_prefix (currency symbol) and kpi_suffix (unit).
 - ${locale === "tr" ? "Generate the chart title in Turkish (Türkçe)." : "Generate the chart title in English."}
 
 Call the render_chart function with your chart configuration.`;

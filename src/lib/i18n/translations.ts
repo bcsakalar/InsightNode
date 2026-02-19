@@ -14,6 +14,11 @@ export interface Translations {
         connectDb: string;
         change: string;
         poweredBy: string;
+        savedConnections: string;
+        noSavedConnections: string;
+        logout: string;
+        darkMode: string;
+        lightMode: string;
     };
     // Command Input
     commandInput: {
@@ -37,6 +42,8 @@ export interface Translations {
         trendLinesDesc: string;
         pieCharts: string;
         pieChartsDesc: string;
+        suggestedQuestions: string;
+        loadingSuggestions: string;
     };
     // Connection Modal
     connectionModal: {
@@ -70,6 +77,31 @@ export interface Translations {
         showQuery: string;
         hideQuery: string;
         rows: string;
+        exportPng: string;
+        exportCsv: string;
+        exportJson: string;
+        delete: string;
+    };
+    // Progress
+    progress: {
+        generating: string;
+        validating: string;
+        executing: string;
+        charting: string;
+    };
+    // Suggestions
+    suggestions: {
+        title: string;
+        loading: string;
+    };
+    // Dashboard
+    dashboard: {
+        saveDashboard: string;
+        dashboardName: string;
+        savedDashboards: string;
+        noDashboards: string;
+        newDashboard: string;
+        deleteDashboard: string;
     };
     // Toasts
     toasts: {
@@ -81,6 +113,10 @@ export interface Translations {
         networkError: string;
         connectDbFirst: string;
         noResults: string;
+        exported: string;
+        chartDeleted: string;
+        connectionSaved: string;
+        connectionDeleted: string;
     };
     // Footer
     footer: {
@@ -103,6 +139,11 @@ export const translations: Record<Locale, Translations> = {
             connectDb: "Connect DB",
             change: "Change",
             poweredBy: "Gemini",
+            savedConnections: "Saved Connections",
+            noSavedConnections: "No saved connections",
+            logout: "Logout",
+            darkMode: "Dark Mode",
+            lightMode: "Light Mode",
         },
         commandInput: {
             askYourData: "Ask your data",
@@ -132,6 +173,8 @@ export const translations: Record<Locale, Translations> = {
             trendLinesDesc: "Track metrics over time",
             pieCharts: "Pie Charts",
             pieChartsDesc: "Visualize proportions and shares",
+            suggestedQuestions: "Suggested Questions",
+            loadingSuggestions: "AI is analyzing your schema...",
         },
         connectionModal: {
             title: "Connect Database",
@@ -163,6 +206,28 @@ export const translations: Record<Locale, Translations> = {
             showQuery: "Show Query",
             hideQuery: "Hide Query",
             rows: "rows",
+            exportPng: "Export PNG",
+            exportCsv: "Export CSV",
+            exportJson: "Export JSON",
+            delete: "Delete",
+        },
+        progress: {
+            generating: "Generating query...",
+            validating: "Validating...",
+            executing: "Querying database...",
+            charting: "Creating chart...",
+        },
+        suggestions: {
+            title: "Suggested Questions",
+            loading: "Generating suggestions...",
+        },
+        dashboard: {
+            saveDashboard: "Save Dashboard",
+            dashboardName: "Dashboard Name",
+            savedDashboards: "Saved Dashboards",
+            noDashboards: "No saved dashboards",
+            newDashboard: "New Dashboard",
+            deleteDashboard: "Delete Dashboard",
         },
         toasts: {
             connectedTo: "Connected to",
@@ -173,6 +238,10 @@ export const translations: Record<Locale, Translations> = {
             networkError: "Network error. Please try again.",
             connectDbFirst: "Please connect a database first.",
             noResults: "The query returned no results. Try a different question.",
+            exported: "Exported successfully!",
+            chartDeleted: "Chart removed.",
+            connectionSaved: "Connection saved.",
+            connectionDeleted: "Connection deleted.",
         },
         footer: {
             brand: "InsightNode — AI-Powered Dashboard Builder",
@@ -191,6 +260,11 @@ export const translations: Record<Locale, Translations> = {
             connectDb: "Veritabanı Bağla",
             change: "Değiştir",
             poweredBy: "Gemini",
+            savedConnections: "Kayıtlı Bağlantılar",
+            noSavedConnections: "Kayıtlı bağlantı yok",
+            logout: "Çıkış",
+            darkMode: "Koyu Tema",
+            lightMode: "Açık Tema",
         },
         commandInput: {
             askYourData: "Verinize sorun",
@@ -220,6 +294,8 @@ export const translations: Record<Locale, Translations> = {
             trendLinesDesc: "Zaman içindeki metrikleri takip edin",
             pieCharts: "Pasta Grafikler",
             pieChartsDesc: "Oranları ve payları görselleştirin",
+            suggestedQuestions: "Önerilen Sorular",
+            loadingSuggestions: "AI şemanızı analiz ediyor...",
         },
         connectionModal: {
             title: "Veritabanı Bağla",
@@ -252,6 +328,28 @@ export const translations: Record<Locale, Translations> = {
             showQuery: "Sorguyu Göster",
             hideQuery: "Sorguyu Gizle",
             rows: "satır",
+            exportPng: "PNG İndir",
+            exportCsv: "CSV İndir",
+            exportJson: "JSON İndir",
+            delete: "Sil",
+        },
+        progress: {
+            generating: "Sorgu oluşturuluyor...",
+            validating: "Doğrulanıyor...",
+            executing: "Veritabanı sorgulanıyor...",
+            charting: "Grafik hazırlanıyor...",
+        },
+        suggestions: {
+            title: "Önerilen Sorular",
+            loading: "Öneriler oluşturuluyor...",
+        },
+        dashboard: {
+            saveDashboard: "Dashboard Kaydet",
+            dashboardName: "Dashboard Adı",
+            savedDashboards: "Kayıtlı Dashboard'lar",
+            noDashboards: "Kayıtlı dashboard yok",
+            newDashboard: "Yeni Dashboard",
+            deleteDashboard: "Dashboard Sil",
         },
         toasts: {
             connectedTo: "Bağlanıldı:",
@@ -262,6 +360,10 @@ export const translations: Record<Locale, Translations> = {
             networkError: "Ağ hatası. Lütfen tekrar deneyin.",
             connectDbFirst: "Lütfen önce bir veritabanı bağlayın.",
             noResults: "Sorgu sonuç döndürmedi. Farklı bir soru deneyin.",
+            exported: "Başarıyla dışa aktarıldı!",
+            chartDeleted: "Grafik kaldırıldı.",
+            connectionSaved: "Bağlantı kaydedildi.",
+            connectionDeleted: "Bağlantı silindi.",
         },
         footer: {
             brand: "InsightNode — Yapay Zeka Destekli Dashboard",

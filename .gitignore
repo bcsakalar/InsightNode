@@ -61,3 +61,6 @@ Thumbs.db
 
 # Gemini AI agent state
 .gemini/
+
+# Server setup guide (internal)
+SERVER.md
